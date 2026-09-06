@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Bao im Bambuswald</title>
+    <meta property="og:title" content="Bao im Bambuswald" />
+    <meta property="og:description" content="Endless Runner: Panda Bao rennt durch den Bambuswald, sammelt Blätter, springt über Speere, stampft Panther platt und besiegt in jedem Level den Löwen." />
+    <meta property="og:image" content="https://d8j0ntlcm91z4.cloudfront.net/user_3Iwz0RTO6PqoeZnWcD6uExRrLX8/hf_20260906_111832_9c9dc6e2-382c-45f5-b05c-9512bf9caf62.png" />
+    <meta name="theme-color" content="#2f9e44" />
+    <link rel="icon" href="assets/icon.png" />
+    <link rel="apple-touch-icon" href="assets/icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --green: #2f9e44;
+        --green-dark: #1e6b2e;
+        --gold: #f7c948;
+        --ink: #1b1d24;
+        --paper: #fffaf0;
+      }
+      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+      html, body {
+        margin: 0; height: 100%; overflow: hidden; background: #0d1a10;
+        font-family: "Fredoka", "Segoe UI Rounded", "Nunito", system-ui, sans-serif;
+        color: var(--paper); touch-action: none; user-select: none; -webkit-user-select: none;
+      }
+      #stage {
+        position: fixed; inset: 0; display: grid; place-items: center;
+      }
+      #frame { position: relative; line-height: 0; }
+      #game { display: block; image-rendering: auto; border-radius: 0; }
+      #frame #hud, #frame #banner { line-height: 1.3; }
+      .overlay {
+        position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
+        padding: 1rem; pointer-events: none;
+      }
+      .overlay[hidden] { display: none; }
+      .panel {
+        pointer-events: auto; max-height: 96vh; overflow: auto;
+        background: rgba(20, 40, 24, 0.86);
+        border: 3px solid rgba(255,255,255,0.18);
+        border-radius: 24px; padding: 1.25rem 1.75rem; max-width: 34rem; width: min(92vw, 34rem);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.45); backdrop-filter: blur(6px);
+      }
+      #title .panel { padding: 0; overflow: hidden; }
+      #title img { width: 100%; display: block; aspect-ratio: 16/9; object-fit: cover; }
+      #title .inner { padding: 1rem 1.5rem 1.5rem; }
+      h1 { margin: 0 0 .25rem; font-size: clamp(1.6rem, 5vw, 2.4rem); color: var(--gold); text-shadow: 0 3px 0 #7a4b00; }
+      h2 { margin: 0 0 .5rem; font-size: clamp(1.4rem, 4.5vw, 2rem); }
+      p { margin: .25rem 0; font-size: clamp(.95rem, 2.6vw, 1.1rem); line-height: 1.4; }
+      .hint { opacity: .85; font-size: .95rem; }
+      .btn {
+        pointer-events: auto; cursor: pointer; font: inherit; font-weight: 700; font-size: 1.25rem;
+        color: var(--ink); background: linear-gradient(#ffe26b, var(--gold)); border: 0;
+        border-radius: 999px; padding: .8rem 2rem; margin-top: .75rem;
+        box-shadow: 0 5px 0 #b3861a, 0 12px 24px rgba(0,0,0,.35); transition: transform .08s;
+      }
+      .btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #b3861a; }
+      #hud {
+        position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between;
+        align-items: center; padding: .6rem .9rem; pointer-events: none; font-weight: 700;
+        font-size: clamp(.9rem, 2.5vw, 1.2rem); text-shadow: 0 2px 4px rgba(0,0,0,.5);
+      }
+      #hud[hidden] { display: none; }
+      #hud .pill {
+        background: rgba(0,0,0,.35); border-radius: 999px; padding: .25rem .8rem; margin-right: .4rem;
+        display: inline-flex; align-items: center; gap: .35rem;
+      }
+      #hud img { height: 1.1em; }
+      #shield { color: #7be0ff; }
+      #shield[data-on="0"] { opacity: .35; }
+      #mute {
+        pointer-events: auto; cursor: pointer; font: inherit; font-size: 1.1rem; color: #fff;
+        background: rgba(0,0,0,.35); border: 0; border-radius: 999px; width: 2.4rem; height: 2.4rem;
+      }
+      #banner {
+        position: absolute; left: 0; right: 0; top: 30%; text-align: center; pointer-events: none;
+        font-size: clamp(1.8rem, 7vw, 3.4rem); font-weight: 700; color: var(--gold);
+        text-shadow: 0 4px 0 #7a4b00, 0 10px 30px rgba(0,0,0,.5);
+        opacity: 0; transform: scale(.8); transition: opacity .3s, transform .3s;
+      }
+      #banner.show { opacity: 1; transform: scale(1); }
+      #banner small { display: block; font-size: .45em; color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,.6); }
+      .stats { display: flex; justify-content: center; gap: 1.5rem; margin: .5rem 0; }
+      .stats div { font-size: 1.05rem; }
+      .stats b { display: block; font-size: 1.9rem; color: var(--gold); }
+      #tapzone { position: absolute; inset: 0; }
+      @media (max-height: 600px) { #title img { display: none; } }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <div id="frame">
+      <canvas id="game" width="960" height="540"></canvas>
+      <div id="tapzone"></div>
+      <div id="hud" hidden>
+        <div>
+          <span class="pill"><img src="assets/leaf.png" alt="" /><span id="score">0</span></span>
+          <span class="pill" id="levelpill">Level 1</span>
+          <span class="pill" id="shield" data-on="0">🛡 Schild</span>
+        </div>
+        <div>
+          <span class="pill">Best <span id="best">0</span></span>
+          <button id="mute" type="button" aria-label="Ton an/aus">🔊</button>
+        </div>
+      </div>
+      <div id="banner"></div>
+      </div>
+      <div id="title" class="overlay">
+        <div class="panel">
+          <img src="assets/cover.jpg" alt="Bao im Bambuswald" />
+          <div class="inner">
+            <p>Bao rennt von allein. Du springst.</p>
+            <p class="hint">🌿 Blätter sammeln · 10 Blätter = Schild · 🐆 Panther von oben plattstampfen · 🦁 Löwe: mehrmals auf den Kopf springen</p>
+            <button class="btn" id="start" type="button">Los geht's!</button>
+            <p class="hint">Leertaste oder Tippen = Springen · Gedrückt halten = Supersprung (hohe Speere, goldene Blätter)</p>
+            <p class="hint" id="titlebest"></p>
+          </div>
+        </div>
+      </div>
+      <div id="over" class="overlay" hidden>
+        <div class="panel">
+          <h2 id="overtitle">Game Over</h2>
+          <p id="overtext"></p>
+          <div class="stats">
+            <div>Punkte<b id="overscore">0</b></div>
+            <div>Blätter<b id="overleaves">0</b></div>
+            <div>Level<b id="overlevel">1</b></div>
+          </div>
+          <p class="hint" id="overbest"></p>
+          <button class="btn" id="retry" type="button">Nochmal</button>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="client.js"></script>
+  </body>
+</html>
