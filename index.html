@@ -92,6 +92,12 @@
       .stats { display: flex; justify-content: center; gap: 1.5rem; margin: .5rem 0; }
       .stats div { font-size: 1.05rem; }
       .stats b { display: block; font-size: 1.9rem; color: var(--gold); }
+      .btn.small { font-size: 1rem; padding: .6rem 1.3rem; margin-top: .9rem; background: linear-gradient(#9be27a, #4fbf5a); box-shadow: 0 4px 0 #2b7a34, 0 10px 20px rgba(0,0,0,.3); }
+      .btn.small:active { box-shadow: 0 1px 0 #2b7a34; }
+      .linkbtn { pointer-events: auto; cursor: pointer; font: inherit; font-size: .85rem; color: #cfe8d2; background: none; border: 0; text-decoration: underline; opacity: .8; }
+      #install { border-top: 1px solid rgba(255,255,255,.15); margin-top: .8rem; padding-top: .2rem; }
+      #install[hidden] { display: none; }
+      #installhint b { color: var(--gold); }
       #tapzone { position: absolute; inset: 0; }
       @media (max-height: 600px) { #title img { display: none; } }
     </style>
@@ -123,6 +129,11 @@
             <button class="btn" id="start" type="button">Los geht's!</button>
             <p class="hint">Leertaste oder Tippen = Springen · Gedrückt halten = Supersprung (hohe Speere, goldene Blätter)</p>
             <p class="hint" id="titlebest"></p>
+            <div id="install" hidden>
+              <button class="btn small" id="installbtn" type="button">📲 Als App auf den Startbildschirm</button>
+              <p class="hint" id="installhint"></p>
+              <button class="linkbtn" id="installclose" type="button">Später</button>
+            </div>
           </div>
         </div>
       </div>

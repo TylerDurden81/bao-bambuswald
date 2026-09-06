@@ -1223,5 +1223,74 @@ function frame(ts) {
 resize();
 newGame();
 updateHud();
+
+// ── install hint (add to home screen) ─────────────────────────────────────
+
+const installBox = $("#install");
+const installBtn = $("#installbtn");
+const installHint = $("#installhint");
+const installClose = $("#installclose");
+let installPrompt = null;
+const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.matchMedia("(display-mode: fullscreen)").matches || navigator.standalone === true;
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+let installDismissed = false;
+try {
+  installDismissed = localStorage.getItem("bao:installDismissed") === "1";
+} catch {
+  /* storage blocked */
+}
+function showInstall(mode) {
+  if (isStandalone || installDismissed) return;
+  installBox.hidden = false;
+  if (mode === "prompt") {
+    installBtn.hidden = false;
+    installHint.textContent = "Spielt dann im Vollbild, mit eigenem Icon, auch offline.";
+  } else if (mode === "ios") {
+    installBtn.hidden = true;
+    installHint.innerHTML = "";
+    const parts = ["Auf dem iPhone: In Safari unten das ", "Teilen-Symbol", " tippen, dann ", "„Zum Home-Bildschirm“", " wählen. Dann läuft Bao wie eine App."];
+    parts.forEach((t, i) => {
+      const node = i % 2 === 1 ? document.createElement("b") : document.createTextNode(t);
+      if (i % 2 === 1) node.textContent = t;
+      installHint.append(node);
+    });
+  } else {
+    installBtn.hidden = true;
+    installHint.textContent = "Tipp: Über das Browser-Menü „Zum Startbildschirm hinzufügen“ läuft Bao wie eine App.";
+  }
+}
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  installPrompt = e;
+  showInstall("prompt");
+});
+window.addEventListener("appinstalled", () => {
+  installBox.hidden = true;
+});
+installBtn.addEventListener("click", async (e) => {
+  e.stopPropagation();
+  if (!installPrompt) return;
+  installPrompt.prompt();
+  try {
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === "accepted") installBox.hidden = true;
+  } catch {
+    /* prompt cancelled */
+  }
+  installPrompt = null;
+});
+installClose.addEventListener("click", (e) => {
+  e.stopPropagation();
+  installBox.hidden = true;
+  installDismissed = true;
+  try {
+    localStorage.setItem("bao:installDismissed", "1");
+  } catch {
+    /* storage blocked */
+  }
+});
+for (const el2 of [installBtn, installClose]) el2.addEventListener("pointerdown", (e) => e.stopPropagation());
+if (isIOS) showInstall("ios");
+else if (/Android/i.test(navigator.userAgent)) setTimeout(() => { if (!installPrompt) showInstall("generic"); }, 2500);
 loadImages().then(() => requestAnimationFrame(frame));
 connect();

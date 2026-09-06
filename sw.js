@@ -1,5 +1,5 @@
 // Service Worker: caches the whole game so it starts offline once installed.
-const CACHE = "bao-v1";
+const CACHE = "bao-v2";
 const FILES = [
   "./",
   "index.html",
