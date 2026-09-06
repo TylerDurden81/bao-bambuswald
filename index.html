@@ -9,7 +9,12 @@
     <meta property="og:image" content="https://d8j0ntlcm91z4.cloudfront.net/user_3Iwz0RTO6PqoeZnWcD6uExRrLX8/hf_20260906_111832_9c9dc6e2-382c-45f5-b05c-9512bf9caf62.png" />
     <meta name="theme-color" content="#2f9e44" />
     <link rel="icon" href="assets/icon.png" />
-    <link rel="apple-touch-icon" href="assets/icon.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Bao" />
+    <link rel="apple-touch-icon" href="assets/icon-192.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet" />
@@ -136,5 +141,8 @@
       </div>
     </div>
     <script type="module" src="client.js"></script>
+    <script>
+      if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+    </script>
   </body>
 </html>
